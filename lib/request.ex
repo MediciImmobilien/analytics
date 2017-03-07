@@ -16,16 +16,28 @@ defmodule Request do
 		|> Poison.decode!
 		|> prepare_result	
 	end
-		
-	def prepare_result(%{"reports" => [%{"data" => %{"rows" => rows}}]}) do 
-		{:ok, rows}  
+	
+	def prepare_result(%{"reports" => [%{"columnHeader" => %{"metricHeader" => %{"metricHeaderEntries" => [%{"name" => _name,"type" => "INTEGER"}]}}, "data" => %{"rows" => rows}}]}) do 
+		{:ok,rows |> Enum.map(fn(%{"dimensions" => [dimensions], "metrics" => [%{"values" => [values]}]}) -> %{dimensions: dimensions, value: values |> String.to_integer} end)}
+	end
+	
+	def prepare_result(%{"reports" => [%{"columnHeader" => %{"metricHeader" => %{"metricHeaderEntries" => [%{"name" => _name,"type" => "CURRENCY"}]}}, "data" => %{"rows" => rows}}]}) do 
+		{:ok,rows |> Enum.map(fn(%{"dimensions" => [dimensions], "metrics" => [%{"values" => [values]}]}) -> %{dimensions: dimensions, value: values |> String.to_float} end)}
+	end
+
+	def prepare_result(%{"reports" => [%{"columnHeader" => %{"metricHeader" => %{"metricHeaderEntries" => [%{"name" => _name,"type" => "FLOAT"}]}}, "data" => %{"rows" => rows}}]}) do 
+		{:ok,rows |> Enum.map(fn(%{"dimensions" => [dimensions], "metrics" => [%{"values" => [values]}]}) -> %{dimensions: dimensions, value: values |> String.to_float} end)}
 	end
 
 	def prepare_result(%{"reports" => [%{"data" => %{"totals" => [%{"values" => ["0.0"]}]}}]}) do
 		{:ok,[]}
 	end
-		
-	def prepare_result(%{"error" => %{"code" => code, "message" => message,"status" => status}}) do
+	
+	def prepare_result(%{"reports" => [%{"data" => %{"totals" => [%{"values" => ["0"]}]}}]}) do
+		{:ok,[]}
+	end
+	
+	def prepare_result(%{"error" => %{"message" => message}}) do
 		{:error,  message}
 	end		
 end
