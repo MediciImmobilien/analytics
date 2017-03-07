@@ -30,11 +30,11 @@ defmodule Request do
 	end
 
 	def prepare_result(%{"reports" => [%{"data" => %{"totals" => [%{"values" => ["0.0"]}]}}]}) do
-		{:ok,[]}
+		{:ok,%{dimensions: [], values: []}}
 	end
 	
 	def prepare_result(%{"reports" => [%{"data" => %{"totals" => [%{"values" => ["0"]}]}}]}) do
-		{:ok,[]}
+		{:ok,%{dimensions: [], values: []}}
 	end
 	
 	def prepare_result(%{"error" => %{"message" => message}}) do
