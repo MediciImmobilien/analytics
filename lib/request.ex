@@ -18,15 +18,15 @@ defmodule Request do
 	end
 	
 	def prepare_result(%{"reports" => [%{"columnHeader" => %{"metricHeader" => %{"metricHeaderEntries" => [%{"name" => _name,"type" => "INTEGER"}]}}, "data" => %{"rows" => rows}}]}) do 
-		{:ok,rows |> Enum.map(fn(%{"dimensions" => [dimensions], "metrics" => [%{"values" => [values]}]}) -> %{dimensions: dimensions, value: values |> String.to_integer} end)}
+		{:ok,rows |> Enum.map(fn(%{"dimensions" => [dimensions], "metrics" => [%{"values" => [values]}]}) -> %{dimensions: dimensions, values: values |> String.to_integer} end)}
 	end
 	
 	def prepare_result(%{"reports" => [%{"columnHeader" => %{"metricHeader" => %{"metricHeaderEntries" => [%{"name" => _name,"type" => "CURRENCY"}]}}, "data" => %{"rows" => rows}}]}) do 
-		{:ok,rows |> Enum.map(fn(%{"dimensions" => [dimensions], "metrics" => [%{"values" => [values]}]}) -> %{dimensions: dimensions, value: values |> String.to_float} end)}
+		{:ok,rows |> Enum.map(fn(%{"dimensions" => [dimensions], "metrics" => [%{"values" => [values]}]}) -> %{dimensions: dimensions, values: values |> String.to_float} end)}
 	end
 
 	def prepare_result(%{"reports" => [%{"columnHeader" => %{"metricHeader" => %{"metricHeaderEntries" => [%{"name" => _name,"type" => "FLOAT"}]}}, "data" => %{"rows" => rows}}]}) do 
-		{:ok,rows |> Enum.map(fn(%{"dimensions" => [dimensions], "metrics" => [%{"values" => [values]}]}) -> %{dimensions: dimensions, value: values |> String.to_float} end)}
+		{:ok,rows |> Enum.map(fn(%{"dimensions" => [dimensions], "metrics" => [%{"values" => [values]}]}) -> %{dimensions: dimensions, values: values |> String.to_float} end)}
 	end
 
 	def prepare_result(%{"reports" => [%{"data" => %{"totals" => [%{"values" => ["0.0"]}]}}]}) do
