@@ -1,7 +1,4 @@
 defmodule Analytics.Request do
-	
-
-	
 	@url "https://analyticsreporting.googleapis.com/v4/reports:batchGet" 
 		
 	def body(dateRanges, metrics,dimensions) do 
@@ -17,49 +14,32 @@ defmodule Analytics.Request do
 		{:ok, %{body: body}} = HTTPoison.post(@url,body(dateRanges, metrics,dimensions),headers)
 		body 
 		|> Poison.decode!
-		|> prepare_result	
+		|> handle_result	
 	end
 	
-	def prepare_result(%{"reports" => [%{"columnHeader" => %{"metricHeader" => %{"metricHeaderEntries" => [%{"name" => _name,"type" => "INTEGER"}]}}, "data" => %{"rows" => rows}}]}) do 
-		{:ok,%{dimensions: rows |> Enum.map(fn(%{"dimensions" => [dimensions]}) -> dimensions end), values: rows|> Enum.map(fn(%{"metrics" => [%{"values" => [values]}]}) ->  values |> String.to_integer end)}}
+	def handle_result(%{"reports" => [%{"columnHeader" => %{"dimensions" => [dimensionsheader], "metricHeader" => %{"metricHeaderEntries" => metricHeaderEntries}}, "data" => %{"rows" => rows}}]}) do
+		{:ok, rows |> Enum.map(fn(%{"dimensions" => [dimension],"metrics" => [%{"values" => values}]})-> Map.merge(%{dimensionsheader => dimension}, handle_metrics(metricHeaderEntries,values)) end)}
 	end
 	
-	def prepare_result(%{"reports" => [%{"columnHeader" => %{"metricHeader" => %{"metricHeaderEntries" => [%{"name" => _name,"type" => "CURRENCY"}]}}, "data" => %{"rows" => rows}}]}) do 
-		{:ok,%{dimensions: rows |> Enum.map(fn(%{"dimensions" => [dimensions]}) -> dimensions end), values: rows|> Enum.map(fn(%{"metrics" => [%{"values" => [values]}]}) ->   values |> String.to_float |> parse_money end)}}
+	def handle_result(%{"error" => %{"message" => message}}) do
+		{:error,  message}
+	end		
 	
-	
-	
-	
-	
-	
-	
+	def handle_metrics(metricHeaderEntries,values) do 
+		for {{name, type}, value} <- Enum.zip(metricHeaderEntries |> Enum.map(fn(%{"name" => name, "type" => type}) -> {name,type} end), values) do 
+			case {{name, type}, value} do
+				{{name, "INTEGER"}, value} -> {name, value |> String.to_integer}
+				{{name, "CURRENCY"}, value} -> {name, value |> String.to_float |> parse_money }
+				{{name, "FLOAT"}, value} -> {name, value |> String.to_float}
+			end
+		end
+		|> Map.new
 	end
-
+	
 	def parse_money(float) do 
-		
 		{:ok, money} = float
 		|> Float.round(2)
 		|> Money.parse(:USD)
 		money
 	end
-
-
-
-
-
-	def prepare_result(%{"reports" => [%{"columnHeader" => %{"metricHeader" => %{"metricHeaderEntries" => [%{"name" => _name,"type" => "FLOAT"}]}}, "data" => %{"rows" => rows}}]}) do 
-		{:ok,%{dimensions: rows |> Enum.map(fn(%{"dimensions" => [dimensions]}) -> dimensions end), values: rows|> Enum.map(fn(%{"metrics" => [%{"values" => [values]}]}) ->  values |> String.to_float end)}}
-	end
-
-	def prepare_result(%{"reports" => [%{"data" => %{"totals" => [%{"values" => ["0.0"]}]}}]}) do
-		{:ok,%{dimensions: [], values: []}}
-	end
-	
-	def prepare_result(%{"reports" => [%{"data" => %{"totals" => [%{"values" => ["0"]}]}}]}) do
-		{:ok,%{dimensions: [], values: []}}
-	end
-	
-	def prepare_result(%{"error" => %{"message" => message}}) do
-		{:error,  message}
-	end		
 end
