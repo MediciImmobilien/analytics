@@ -1,6 +1,6 @@
 defmodule Analytics do
 	import DateRange
-	import Request
+	import Analytics.Request
 	
 	def get_data(:impression, :current_month, :list) do
 		{:ok, data} = request_data([current_month()], ["ga:impressions"],["ga:day"])

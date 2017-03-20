@@ -1,4 +1,4 @@
-defmodule Request do
+defmodule Analytics.Request do
 	
 
 	
