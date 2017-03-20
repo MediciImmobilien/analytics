@@ -25,8 +25,27 @@ defmodule Request do
 	end
 	
 	def prepare_result(%{"reports" => [%{"columnHeader" => %{"metricHeader" => %{"metricHeaderEntries" => [%{"name" => _name,"type" => "CURRENCY"}]}}, "data" => %{"rows" => rows}}]}) do 
-		{:ok,%{dimensions: rows |> Enum.map(fn(%{"dimensions" => [dimensions]}) -> dimensions end), values: rows|> Enum.map(fn(%{"metrics" => [%{"values" => [values]}]}) ->  values |> String.to_float end)}}
+		{:ok,%{dimensions: rows |> Enum.map(fn(%{"dimensions" => [dimensions]}) -> dimensions end), values: rows|> Enum.map(fn(%{"metrics" => [%{"values" => [values]}]}) ->   values |> String.to_float |> parse_money end)}}
+	
+	
+	
+	
+	
+	
+	
 	end
+
+	def parse_money(float) do 
+		
+		{:ok, money} = float
+		|> Float.round(2)
+		|> Money.parse(:USD)
+		money
+	end
+
+
+
+
 
 	def prepare_result(%{"reports" => [%{"columnHeader" => %{"metricHeader" => %{"metricHeaderEntries" => [%{"name" => _name,"type" => "FLOAT"}]}}, "data" => %{"rows" => rows}}]}) do 
 		{:ok,%{dimensions: rows |> Enum.map(fn(%{"dimensions" => [dimensions]}) -> dimensions end), values: rows|> Enum.map(fn(%{"metrics" => [%{"values" => [values]}]}) ->  values |> String.to_float end)}}
