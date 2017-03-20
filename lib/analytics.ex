@@ -7,7 +7,7 @@ defmodule Analytics do
 		data
 	end
 	
-	def get_data(:adcost, :current_month, :list) do
+	def get_data(:ad_cost, :current_month, :list) do
 		{:ok, data} = request_data([current_month()], ["ga:adCost"],["ga:day"])
 		data
 	end
