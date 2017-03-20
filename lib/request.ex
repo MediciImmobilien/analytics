@@ -1,4 +1,7 @@
 defmodule Request do
+	
+
+	
 	@url "https://analyticsreporting.googleapis.com/v4/reports:batchGet" 
 		
 	def body(dateRanges, metrics,dimensions) do 
@@ -18,7 +21,14 @@ defmodule Request do
 	end
 	
 	def prepare_result(%{"reports" => [%{"columnHeader" => %{"metricHeader" => %{"metricHeaderEntries" => [%{"name" => _name,"type" => "INTEGER"}]}}, "data" => %{"rows" => rows}}]}) do 
-		{:ok,rows |> Enum.map(fn(%{"dimensions" => [dimensions], "metrics" => [%{"values" => [values]}]}) -> %{dimensions: dimensions, values: values |> String.to_integer} end)}
+		#rows|> Enum.map(fn(%{"dimensions" => [dimensions], "metrics" => [%{"values" => [values]}]}) -> %{dimensions: dimensions, values: values |> String.to_integer} end)
+		
+		dimensions = rows |> Enum.map(fn(%{"dimensions" => [dimensions]}) -> dimensions end)
+		
+		values = rows|> Enum.map(fn(%{"metrics" => [%{"values" => [values]}]}) ->  values |> String.to_integer end)
+	
+	
+		{:ok,%{dimensions: dimensions, values: values}}
 	end
 	
 	def prepare_result(%{"reports" => [%{"columnHeader" => %{"metricHeader" => %{"metricHeaderEntries" => [%{"name" => _name,"type" => "CURRENCY"}]}}, "data" => %{"rows" => rows}}]}) do 
