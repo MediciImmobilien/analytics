@@ -13,14 +13,12 @@ defmodule Analytics do
 	end
 	
 	def get_data(:ad_cost, :current_month, :sum) do
-		{:ok, %{values: values}} =  request_data([current_month()], ["ga:adCost"],["ga:day"]) 
-		
-		{:ok, money} = values
-	 	|> Enum.map(fn(%{amount: amount}) -> amount/100 end)
+		{:ok,  values} =  request_data([current_month()], ["ga:adCost"],["ga:day"]) 
+		  values
+	 	|> Enum.map(fn(%{"ga:adCost" => %{amount: amount}}) -> amount end)
 		|> Enum.sum
-		|> Money.parse(:USD)
-		
-		money
+		|> div(100)
+		|> Money.new(:USD)
 	end	
 	
 	def get_data(:impression, :last_month, :list) do
@@ -34,9 +32,11 @@ defmodule Analytics do
 	end
 	
 	def get_data(:ad_cost, :last_month, :sum) do
-		{:ok, data} =  request_data([last_month()], ["ga:adCost"],["ga:day"]) 
-		data
-	 	|> Enum.map(fn(%{value: value}) -> value end)
+		{:ok, values} =  request_data([last_month()], ["ga:adCost"],["ga:day"]) 
+		values
+	 	|> Enum.map(fn(%{"ga:adCost" => %{amount: amount}}) -> amount end)
 		|> Enum.sum
+		|> div(100)
+		|> Money.new(:USD)
 	end	
 end
