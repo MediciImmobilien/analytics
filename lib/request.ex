@@ -17,13 +17,25 @@ defmodule Analytics.Request do
 		|> handle_result	
 	end
 	
-	def handle_result(%{"reports" => [%{"columnHeader" => %{"dimensions" => [dimensionsheader], "metricHeader" => %{"metricHeaderEntries" => metricHeaderEntries}}, "data" => %{"rows" => rows}}]}) do
-		{:ok, rows |> Enum.map(fn(%{"dimensions" => [dimension],"metrics" => [%{"values" => values}]})-> Map.merge(%{dimensionsheader => dimension}, handle_metrics(metricHeaderEntries,values)) end)}
+	def handle_result(%{"reports" => [%{"columnHeader" => %{"dimensions" => dimensionsheaders, "metricHeader" => %{"metricHeaderEntries" => metricHeaderEntries}}, "data" => %{"rows" => rows}}]}) do
+		{:ok, rows |> Enum.map(fn(%{"dimensions" => dimensions,"metrics" => [%{"values" => values}]})-> Map.merge(handle_dimensions(dimensionsheaders, dimensions), handle_metrics(metricHeaderEntries,values)) end)}
 	end
 	
 	def handle_result(%{"error" => %{"message" => message}}) do
 		{:error,  message}
 	end		
+	
+	
+	
+	def handle_dimensions(dimensionsheaders, dimensions) do 
+		
+		for {dimensionsheaders, dimensions} <- Enum.zip(dimensionsheaders, dimensions) do 
+		
+			{dimensionsheaders,dimensions}
+		end
+		|> Map.new
+	end
+	
 	
 	def handle_metrics(metricHeaderEntries,values) do 
 		for {{name, type}, value} <- Enum.zip(metricHeaderEntries |> Enum.map(fn(%{"name" => name, "type" => type}) -> {name,type} end), values) do 
@@ -40,6 +52,8 @@ defmodule Analytics.Request do
 		{:ok, money} = float
 		|> Float.round(2)
 		|> Money.parse(:USD)
+		
 		money
+		#|> Currency.from_usd_to_eur
 	end
 end

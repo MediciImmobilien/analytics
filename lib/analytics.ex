@@ -2,6 +2,19 @@ defmodule Analytics do
 	import DateRange
 	import Analytics.Request
 	
+	
+	
+	def get_data(:impressions) do 
+		{:ok, data} = request_data([current_month()], ["ga:impressions", "ga:adCost", "ga:adClicks"],["ga:day","ga:month","ga:year", "ga:adwordsCampaignID"])
+		data
+		
+		|> Enum.map(fn(%{"ga:year" => year, "ga:month" => month, "ga:day" => day} = item) -> Map.put_new(item, "date", year <> "-" <> month <> "-" <> day |> Date.from_iso8601!)   end)
+		|> Enum.map(fn(map)-> Map.drop(map,["ga:year", "ga:month", "ga:day"]) end)  
+		|> Enum.group_by(fn(%{"ga:adwordsCampaignID" => campaign_id}) -> campaign_id end, fn(map) -> Map.drop(map,["ga:adwordsCampaignID"])end)    
+	
+	end
+	
+	
 	def get_data(:impression, :current_month, :list) do
 		{:ok, data} = request_data([current_month()], ["ga:impressions"],["ga:day"])
 		data
@@ -17,8 +30,9 @@ defmodule Analytics do
 		  values
 	 	|> Enum.map(fn(%{"ga:adCost" => %{amount: amount}}) -> amount end)
 		|> Enum.sum
+		|> div(100)
+		|> Money.new(:EUR)
 		
-		|> Money.new(:USD)
 	end	
 	
 	def get_data(:impression, :last_month, :list) do
