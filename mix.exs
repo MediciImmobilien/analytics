@@ -14,7 +14,7 @@ defmodule Analytics.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :poison, :httpoison, :money, :currency]]
+    [applications: [:logger, :poison, :httpoison, :money]]
   end
 
   # Dependencies can be Hex packages:
@@ -31,7 +31,7 @@ defmodule Analytics.Mixfile do
 		{:poison, "~> 3.1",override: :true},
 		{:httpoison, "~> 0.11.0"},
 		{:money, "~> 1.2"},
-		{:currency, github: "MediciImmobilien/currency"}
+		
 	
 	]
   end
