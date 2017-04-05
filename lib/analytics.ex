@@ -32,6 +32,7 @@ defmodule Analytics do
 		|> Enum.sum
 		|> div(100)
 		|> Money.new(:USD)
+		|> Currency.from_usd_to_eur
 		
 	end	
 	
@@ -52,5 +53,6 @@ defmodule Analytics do
 		|> Enum.sum
 		|> div(100)
 		|> Money.new(:USD)
+		|> Currency.from_usd_to_eur
 	end	
 end
