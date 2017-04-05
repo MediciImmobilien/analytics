@@ -31,7 +31,7 @@ defmodule Analytics do
 	 	|> Enum.map(fn(%{"ga:adCost" => %{amount: amount}}) -> amount end)
 		|> Enum.sum
 		|> div(100)
-		|> Money.new(:EUR)
+		|> Money.new(:USD)
 		
 	end	
 	
