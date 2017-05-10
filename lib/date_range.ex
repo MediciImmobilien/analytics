@@ -12,4 +12,9 @@ defmodule DateRange do
 					end			
 		%{"startDate": Integer.to_string(year)<>"-0"<> Integer.to_string(month)<>"-01" ,"endDate": "today"}
 	end
+	
+	def current_year do 
+		%{year: current_year} = DateTime.utc_now()
+		%{"startDate": Integer.to_string(current_year) <> "-01" <>"-01" ,"endDate": "today"}
+	end
 end
