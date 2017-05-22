@@ -24,7 +24,7 @@ defmodule Analytics do
 		{:ok, data} = request_data([current_year()], ["ga:adCost"],["ga:month"])
 		data
 		|> Enum.map(fn(%{"ga:adCost" => cost, "ga:month" => month}) -> cost |> Currency.from_usd_to_eur  |> IO.inspect end)
-		data		
+			
 	end
 	
 	def get_data(:ad_cost, :current_month, :sum) do
