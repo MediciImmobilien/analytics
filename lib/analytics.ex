@@ -31,9 +31,7 @@ defmodule Analytics do
 		{:ok,  values} =  request_data([current_month()], ["ga:adCost"],["ga:day"]) 
 		  values
 	 	|> Enum.map(fn(%{"ga:adCost" => %{amount: amount}}) -> amount end)
-	
 		|> Enum.sum
-		|> div(100)
 		|> Money.new(:USD)
 			|> IO.inspect
 		|> Currency.from_usd_to_eur
