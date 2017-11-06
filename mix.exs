@@ -27,7 +27,7 @@ defmodule Analytics.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [ 	{:timex, "~> 3.1"}
+    [ 	{:timex, "~> 3.1"},
 		{:poison, "~> 3.1",override: :true},
 		{:httpoison, "~> 0.11.0"},
 		{:money, "~> 1.2"},
