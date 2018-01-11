@@ -21,11 +21,13 @@ defmodule Analytics.Request do
 		{:ok, rows |> Enum.map(fn(%{"dimensions" => dimensions,"metrics" => [%{"values" => values}]})-> Map.merge(handle_dimensions(dimensionsheaders, dimensions), handle_metrics(metricHeaderEntries,values)) end)}
 	end
 	
+	def handle_result(%{"reports" => [%{"columnHeader" => %{"dimensions" => dimensionsheaders, "metricHeader" => %{"metricHeaderEntries" => metricHeaderEntries}},"data" => %{"totals" => _}}]}) do
+		{:ok,[]}
+	end
+	
 	def handle_result(%{"error" => %{"message" => message}}) do
 		{:error,  message}
 	end		
-	
-	
 	
 	def handle_dimensions(dimensionsheaders, dimensions) do 
 		
