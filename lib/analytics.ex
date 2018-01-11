@@ -6,7 +6,7 @@ defmodule Analytics do
 		{:ok, data} = request_data([current_month()], ["ga:impressions", "ga:adCost", "ga:adClicks"],["ga:day","ga:month","ga:year", "ga:adwordsCampaignID"])
 		data
 		|> Enum.map(fn(%{"ga:year" => year, "ga:month" => month, "ga:day" => day} = item) -> Map.put_new(item, "date", year <> "-" <> month <> "-" <> day |> Date.from_iso8601!)   end)
-		|> Enum.map(&(Map.drop(map,["ga:year", "ga:month", "ga:day"])))  
+		|> Enum.map(&(Map.drop(&1,["ga:year", "ga:month", "ga:day"])))  
 		|> Enum.group_by(fn(%{"ga:adwordsCampaignID" => campaign_id}) -> campaign_id end, fn(map) -> Map.drop(map,["ga:adwordsCampaignID"])end)
 	end
 	
