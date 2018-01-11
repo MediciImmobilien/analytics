@@ -7,7 +7,7 @@ defmodule Analytics.Request do
 	end
 
 	def headers do 
-		[{"Content-Type", "application/json"}, {"Authorization", "Bearer " <> Oauth.get_access_token()}]
+		[{"Content-Type", "application/json"}, {"Authorization", "Bearer #{Oauth.get_access_token()}"}]
 	end
 		
 	def request_data(dateRanges, metrics,dimensions) do
@@ -30,14 +30,11 @@ defmodule Analytics.Request do
 	end		
 	
 	def handle_dimensions(dimensionsheaders, dimensions) do 
-		
 		for {dimensionsheaders, dimensions} <- Enum.zip(dimensionsheaders, dimensions) do 
-		
 			{dimensionsheaders,dimensions}
 		end
 		|> Map.new
 	end
-	
 	
 	def handle_metrics(metricHeaderEntries,values) do 
 		for {{name, type}, value} <- Enum.zip(metricHeaderEntries |> Enum.map(fn(%{"name" => name, "type" => type}) -> {name,type} end), values) do 
